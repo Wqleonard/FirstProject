@@ -4,6 +4,9 @@ import {
   ActivityIndicator, Image, Text, View,
   StyleSheet,
   AsyncStorage,
+  ImageBackground,
+  TouchableOpacity,
+  Linking,
 } from 'react-native';
 
 const api = 'https://api.douban.com/v2/movie/subject';
@@ -11,9 +14,20 @@ const styles = StyleSheet.create({
   image: {
     width: 150,
     height: 222,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'visible', // 是否超出父坐标部分可见
+    zIndex: 1, // 层级
   },
   loading: {
     marginTop: 100,
+  },
+  play: {
+    width: 107,
+    height: 107,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
 });
 export default class Detail extends Component {
@@ -23,18 +37,19 @@ export default class Detail extends Component {
     state={
       data: {},
       ready: false,
+      videoUri: '',
     }
     async componentDidMount() {
       const { state: { params: { id } } } = this.props.navigation;
       let textData;
       textData = await AsyncStorage.getItem(id);
-      console.log(textData);
+      // console.log(textData);
       if (textData) {
-        alert('数据来自本地');
+        //         alert('数据来自本地');
       } else {
         const rowData = await fetch(`${api}/${id}`);
         textData = await rowData.text();
-        alert('数据来自服务器');
+        //         alert('数据来自服务器');
       }
 
       // 反序列化 "死"的字符串=>"活"的对象
@@ -47,6 +62,28 @@ export default class Detail extends Component {
         data: jsonData,
         ready: true,
       });
+      this.fetchVideo(jsonData.mobile_url);
+    }
+    fetchVideo= async (mobile_url) => {
+      let pageHtml = await fetch(mobile_url);
+      // 注意,text()需要await
+      pageHtml = await pageHtml.text();
+      const regex = /href="([\w|\W]*\.mp4)"/;
+      const result = pageHtml.match(regex);
+      if (result && result[1]) {
+        const videoUri = result[1];
+        this.setState({
+          videoUri,
+        });
+      }
+    }
+    playVideo=() => {
+      const { videoUri } = this.state;
+      if (videoUri) {
+        Linking.openURL(videoUri);
+      } else {
+        alert('正在获取');
+      }
     }
     render() {
       const { data: { title, summary, image }, ready } = this.state;
@@ -56,7 +93,14 @@ export default class Detail extends Component {
           {
             ready ?
               <View>
-                <Image source={{ uri: image }} style={styles.image} />
+                <TouchableOpacity onPress={this.playVideo}>
+                  <ImageBackground
+                    source={{ uri: image }}
+                    style={styles.image}
+                  >
+                    <Image source={require('../img/play-icon.png')} style={styles.play} />
+                  </ImageBackground>
+                </TouchableOpacity>
                 <Text>{title}</Text>
                 <Text>{summary}</Text>
               </View>
