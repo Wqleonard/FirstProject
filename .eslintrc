@@ -2,7 +2,7 @@
   "extends": "airbnb",
   "parser": "babel-eslint",
   "env": {
-    "es6": true,
+//    "es6": true,
     "node":true,
     "mocha": true,
     "browser": true
@@ -25,8 +25,8 @@
     "no-undef":0,
     "no-console":0,
     "no-alert":0,
-    "indent":[2,2,{"SwitchCase":1}],
-    "arrow-body-style": 0
+    "indent":[2,2,{"SwitchCase":1}]
+//    "arrow-body-style": 0
   },
 //  "max-len": 0,
 //  "vars-on-top": 0,

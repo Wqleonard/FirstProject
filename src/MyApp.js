@@ -1,27 +1,35 @@
-/* eslint-disable react/prefer-stateless-function,global-require,react/jsx-filename-extension */
+/* eslint-disable react/prefer-stateless-function,global-require,react/jsx-filename-extension,no-unused-vars,max-len,no-shadow,consistent-return,react/sort-comp,react/no-did-mount-set-state */
 /**
  *
  */
-import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
-import Item from './components/item';
+import { StackNavigator, TabNavigator } from 'react-navigation';
+import List from './pages/List';
+import Detail from './pages/Detail';
+import Cinemas from './pages/Cinemas';
+import MyMovies from './pages/MyMovies';
 
 
-const styles = StyleSheet.create({
-  root: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
+const MyTab = TabNavigator({
+  List: { screen: List },
+  Cinemas: { screen: Cinemas },
+  MyMovies: { screen: MyMovies },
+}, {
+  tabBarOptions: {
+    activateTintColor: '#390EB',
+    inactivateTintColor: '#fff',
+    labelStyle: {
+      fontSize: 20,
+      marginBottom: 15,
+    },
+    style: {
+      backgroundColor: '#222',
+    },
   },
 });
-export default class MyApp extends Component {
-  render() {
-    return (
-      <View style={styles.root}>
-        <Item />
-        <Item />
-        <Item />
-      </View>
-    );
-  }
-}
+const MyApp = StackNavigator({
+  MyTab: { screen: MyTab, navigationOptions: { header: null } },
+  Detail: { screen: Detail },
+}, {
+  headerMode: 'screen',
+});
+export default MyApp;
